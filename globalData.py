@@ -1,3 +1,3 @@
 def initData():
-	global activeUserSet
-	activeUserSet=set()
+	global activeUserDict
+	activeUserDict=dict()

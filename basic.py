@@ -3,6 +3,7 @@
 import urllib
 import time
 import json
+import requests
 
 class Basic:
     def __init__(self):
@@ -25,7 +26,7 @@ class Basic:
         return self.__accessToken
 
     def __get_user_info_json(self,openid):
-        getUrl=("https://api.weixin.qq.com/cgi-bin/user/info?access_token=%s&openid=%s&lang=en"%(Basic().get_access_token(),openid))
+        getUrl=("https://api.weixin.qq.com/cgi-bin/user/info?access_token=%s&openid=%s&lang=en" % (Basic().get_access_token(),openid))
         urlResp = urllib.urlopen(getUrl)
         urlResp = json.loads(urlResp.read())
         return urlResp
@@ -33,6 +34,12 @@ class Basic:
     def get_user_nickname(self,openid):
         jsonData=self.__get_user_info_json(openid)
         return jsonData['nickname']
+
+    def send_message(self,jsonString):
+        postUrl = ("https://api.weixin.qq.com/cgi-bin/message/custom/send?access_token=%s") % (Basic().get_access_token())
+        response = requests.post(postUrl, data=jsonString)
+        result = response.json()
+        return result['errcode'] == 0 and result['errmsg'] == 'ok'
 
     def run(self):
         while(True):

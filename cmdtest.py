@@ -1,23 +1,49 @@
 import cmd
+from threading import Thread
+from time import sleep
+import sys
+import string, os
+import StringIO
+
+strInput = StringIO.StringIO()
+
+def threaded_function(arg):
+    for i in range(arg):
+        strInput.write("help")
+        print i
+        sleep(1)
 
 class HelloWorld(cmd.Cmd):
     """Simple command processor example."""
-
-    prompt = 'prompt: '
-    intro = "Simple command processor example."
-
-    doc_header = 'doc_header'
-    misc_header = 'misc_header'
-    undoc_header = 'undoc_header'
     
-    ruler = '-'
+    # Disable rawinput module use
+    use_rawinput = False
     
-    def do_prompt(self, line):
-        "Change the interactive prompt"
-        self.prompt = line + ': '
-
+    # Do not show a prompt after each command read
+    prompt = ''
+    
+    def do_greet(self, line):
+        print "hello,", line
+    
     def do_EOF(self, line):
-        return True
+        print "EOF"
 
 if __name__ == '__main__':
-    HelloWorld().cmdloop()
+
+
+
+    thread = Thread(target = threaded_function, args = (10, ))
+    thread.start()
+
+    try:
+        HelloWorld(stdin=strInput).cmdloop()
+    finally:
+        strInput.close()
+
+# if __name__ == '__main__':
+#     import sys
+#     input = open(sys.argv[1], 'rt')
+#     try:
+#         HelloWorld(stdin=input).cmdloop()
+#     finally:
+#         input.close()

@@ -7,6 +7,8 @@ class Msg(object):
         pass
     def send(self):
         return "success"
+    def sendJSON(self):
+        return "{}"
 
 class TextMsg(Msg):
     def __init__(self, toUserName, fromUserName, content):
@@ -27,6 +29,12 @@ class TextMsg(Msg):
         </xml>
         """
         return XmlForm.format(**self.__dict)
+
+    def sendJSON(self):
+        JsonString = '{"touser":"%s","msgtype":"%s","text":{"content":"%s"}}' % (self.__dict['ToUserName'],"text",self.__dict['Content'])
+        return JsonString
+
+
     
 class ImageMsg(Msg):
     def __init__(self, toUserName, fromUserName, mediaId):
@@ -48,3 +56,8 @@ class ImageMsg(Msg):
         </xml>
         """
         return XmlForm.format(**self.__dict)
+
+    def sendJSON(self):
+        JsonString = '{"touser":"%s","msgtype":"%s","image":{"media_id":"%s"}}' % (self.__dict['ToUserName'],"image",self.__dict['MediaId'])
+        return JsonString
+

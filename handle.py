@@ -5,6 +5,7 @@ import reply
 import receive
 import web
 from terminal import Terminal
+from basic import Basic
 
 class Handle(object):
 
@@ -42,9 +43,21 @@ class Handle(object):
                 toUser = recMsg.FromUserName
                 fromUser = recMsg.ToUserName
                 receivedContent = recMsg.Content
-                content = Terminal().process(recMsg.FromUserName,receivedContent)
-                replyMsg = reply.TextMsg(toUser, fromUser, content)
-                return replyMsg.send()
+                contents = Terminal().process(recMsg.FromUserName,receivedContent)
+
+                successFlag = True
+                #print contents
+                for content in contents:
+                    replyMsg = reply.TextMsg(toUser, fromUser, content)
+                    #print replyMsg.sendJSON()
+                    tempFlag = Basic().send_message(replyMsg.sendJSON())
+                    if not tempFlag:
+                        successFlag = False
+
+                if successFlag:
+                    return "success"
+                else:
+                    return
             else:
                 print "Ignored"
                 return "success"
