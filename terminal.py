@@ -26,6 +26,13 @@ class Terminal(object):
 				"0x011115 File Missing\n"+
 				"0x0843C4 File Missing\n"),
 
+			"list -a":("0x0089AB readme 20161211\n"+
+				"0x01000D File Missing\n"+
+				"0x00C000 File Missing\n"+
+				"0x0F9090 File Missing\n"+
+				"0x011115 File Missing\n"+
+				"0x0843C4 File Missing\n"),
+
 			"info Dogi":("Dogi series is an advanced AI system in development.\n\n"+
 				"Dogi with its full ability will promise human a brave new world.\n\n"+
 				"The main contributor to Dogi is Dr.Ferrari. Dogi is supported by Ginne Inc."),
@@ -64,7 +71,7 @@ class Terminal(object):
 				if content == "human":
 					globalData.activeUserDict[fromUserName] = 'Logged In'
 					result1 = "Identifying...Success."
-					result2 = "Welcome, "+Basic().get_user_nickname(fromUserName)+"\nType [help] for help."
+					result2 = "Welcome, "+globalData.wechatBasic.get_user_nickname(fromUserName)+"\nType [help] for help."
 					result2 = result2.encode('utf-8')
 					resultList = [result1,result2]
 					return resultList
@@ -89,7 +96,7 @@ class Terminal(object):
 					#print 3
 					globalData.activeUserDict.pop(fromUserName)
 					#print globalData.activeUserSet
-					result1 = "Logged out, "+Basic().get_user_nickname(fromUserName)
+					result1 = "Logged out, "+globalData.wechatBasic.get_user_nickname(fromUserName)
 					result1 = result1.encode('utf-8')
 					result2 = ("Shutting Down\n"+
 						"=============>100%\n"+

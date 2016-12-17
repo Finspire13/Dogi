@@ -4,6 +4,7 @@ import hashlib
 import reply
 import receive
 import web
+import globalData
 from terminal import Terminal
 from basic import Basic
 
@@ -50,7 +51,7 @@ class Handle(object):
                 for content in contents:
                     replyMsg = reply.TextMsg(toUser, fromUser, content)
                     #print replyMsg.sendJSON()
-                    tempFlag = Basic().send_message(replyMsg.sendJSON())
+                    tempFlag = globalData.wechatBasic.send_message(replyMsg.sendJSON())
                     if not tempFlag:
                         successFlag = False
 
