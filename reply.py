@@ -23,7 +23,7 @@ class ReplyMessage:
             <Content><![CDATA[{content}]]></Content>
             </xml>
             """.format(**self.dict)
-        else:
+        elif self.type == 'image':                                       #More type will be added
             xml_form = """
             <xml>
             <ToUserName><![CDATA[{to_user_name}]]></ToUserName>
@@ -35,6 +35,9 @@ class ReplyMessage:
             </Image>
             </xml>
             """.format(**self.dict)
+        else:
+            xml_form=""
+            
         return xml_form
 
     def get_json(self):

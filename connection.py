@@ -7,6 +7,7 @@ class Connection:
         self.gift_list = dict()
         self.zbug = []
         self.me = None
+        self.access_token_count = 0
     def send_message(self, data):
         api_url = settings.api_url
         endpoint = 'message/custom/send'
@@ -24,6 +25,10 @@ class Connection:
             response = requests.get('{api_url}/{endpoint}', api_url=settings.api_url, endpoint=endpoint, params=params)
             settings.access_token = response.text['access_token']
             settings.timer = time.time() + response.text['expires_in'] - 10.0
+
+            self.access_token_count += 1
+            print "Get Access Token! Count: " + str(self.access_token_count)
+
         return settings.access_token
 
     def get_user_info(self, openid):

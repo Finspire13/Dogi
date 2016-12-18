@@ -54,7 +54,7 @@ def process(user, content):
                  for i in range(0, len(connection.gift_list)):
                      from reply import ReplyMessage
                      reply_message = ReplyMessage(connection.zbug[i], connection.me, connection.gift_list[i], 'text')
-                     connection.send_message(reply_message)
+                     connection.send_message(reply_message.get_json())
                      result_list.append(connection.gift_list[i])
                  return result_list
             else:
