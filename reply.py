@@ -1,63 +1,45 @@
-# -*- coding: utf-8 -*-
-# filename: reply.py
 import time
 
-class Msg(object):
-    def __init__(self):
-        pass
-    def send(self):
-        return "success"
-    def sendJSON(self):
-        return "{}"
+class ReplyMessage:
+    def __init__(self, to_user_name, from_user_name, content, type):
+        self.dict = dict()
+        self.dict['to_user_name'] = to_user_name
+        self.dict['from_user_name'] = from_user_name
+        self.dict['create_time'] = int(time.time())
+        self.type = type
+        if type == 'text':
+            self.dict['content'] = content
+        else:
+            self.dict['media_id'] = content
 
-class TextMsg(Msg):
-    def __init__(self, toUserName, fromUserName, content):
-        self.__dict = dict()
-        self.__dict['ToUserName'] = toUserName
-        self.__dict['FromUserName'] = fromUserName
-        self.__dict['CreateTime'] = int(time.time())
-        self.__dict['Content'] = content
+    def get_xml(self):
+        if self.type == 'text':
+            xml_form = """
+            <xml>
+            <ToUserName><![CDATA[{to_user_name}]]></ToUserName>
+            <FromUserName><![CDATA[{from_user_name}]]></FromUserName>
+            <CreateTime>{create_time}</CreateTime>
+            <MsgType><![CDATA[text]]></MsgType>
+            <Content><![CDATA[{content}]]></Content>
+            </xml>
+            """.format(**self.dict)
+        else:
+            xml_form = """
+            <xml>
+            <ToUserName><![CDATA[{to_user_name}]]></ToUserName>
+            <FromUserName><![CDATA[{from_user_name}]]></FromUserName>
+            <CreateTime>{create_time}</CreateTime>
+            <MsgType><![CDATA[image]]></MsgType>
+            <Image>
+            <MediaId><![CDATA[{media_id}]]></MediaId>
+            </Image>
+            </xml>
+            """.format(**self.dict)
+        return xml_form
 
-    def send(self):
-        XmlForm = """
-        <xml>
-        <ToUserName><![CDATA[{ToUserName}]]></ToUserName>
-        <FromUserName><![CDATA[{FromUserName}]]></FromUserName>
-        <CreateTime>{CreateTime}</CreateTime>
-        <MsgType><![CDATA[text]]></MsgType>
-        <Content><![CDATA[{Content}]]></Content>
-        </xml>
-        """
-        return XmlForm.format(**self.__dict)
-
-    def sendJSON(self):
-        JsonString = '{"touser":"%s","msgtype":"%s","text":{"content":"%s"}}' % (self.__dict['ToUserName'],"text",self.__dict['Content'])
-        return JsonString
-
-
-    
-class ImageMsg(Msg):
-    def __init__(self, toUserName, fromUserName, mediaId):
-        self.__dict = dict()
-        self.__dict['ToUserName'] = toUserName
-        self.__dict['FromUserName'] = fromUserName
-        self.__dict['CreateTime'] = int(time.time())
-        self.__dict['MediaId'] = mediaId
-    def send(self):
-        XmlForm = """
-        <xml>
-        <ToUserName><![CDATA[{ToUserName}]]></ToUserName>
-        <FromUserName><![CDATA[{FromUserName}]]></FromUserName>
-        <CreateTime>{CreateTime}</CreateTime>
-        <MsgType><![CDATA[image]]></MsgType>
-        <Image>
-        <MediaId><![CDATA[{MediaId}]]></MediaId>
-        </Image>
-        </xml>
-        """
-        return XmlForm.format(**self.__dict)
-
-    def sendJSON(self):
-        JsonString = '{"touser":"%s","msgtype":"%s","image":{"media_id":"%s"}}' % (self.__dict['ToUserName'],"image",self.__dict['MediaId'])
-        return JsonString
-
+    def get_json(self):
+        if self.type == 'text':
+            json_string = '{"touser":"{to_user_name}","msgtype":"text","text":{"content":"{content}"}}'.format(**self.dict)
+        else:
+            json_string = '{"touser":"{to_user_name}","msgtype":"image","image":{"media_id":"{media_id}"}}' .format(**self.dict)
+        return json_string

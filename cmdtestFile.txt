@@ -1,5 +1,0 @@
-help
-help greet
-greet
-greet Alice and Bob
-gfhd

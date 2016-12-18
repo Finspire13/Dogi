@@ -1,15 +1,12 @@
-# -*- coding: utf-8 -*-
-# filename: handle.py
 import hashlib
-import reply
-import receive
+from reply import ReplyMessage
+from receive import ReceiveMessage
 import web
-import globalData
-from terminal import Terminal
-from basic import Basic
+from terminal import process
+from connection import connection
+
 
 class Handle(object):
-
     def GET(self):
         try:
             data = web.input()
@@ -34,33 +31,29 @@ class Handle(object):
         except Exception, Argument:
             return Argument
 
-
     def POST(self):
         try:
-            webData = web.data()
-            print "Handle Post webdata is ", webData
-            recMsg = receive.parse_xml(webData)
-            if isinstance(recMsg, receive.Msg) and recMsg.MsgType == 'text':
-                toUser = recMsg.FromUserName
-                fromUser = recMsg.ToUserName
-                receivedContent = recMsg.Content
-                contents = Terminal().process(recMsg.FromUserName,receivedContent)
-
-                successFlag = True
-                #print contents
+            web_data = web.data()
+            if len(web_data) == 0:
+                return "success"
+            receive_message = ReceiveMessage(web_data)
+            if receive_message and receive_message.message_type == 'text':
+                to_user = receive_message.from_user_name
+                from_user = receive_message.to_user_name
+                received_content = receive_message.content
+                contents = process(to_user, received_content)
+                if to_user not in connection.zbug:
+                    connection.zbug.append(to_user)
+                    connection.me = from_user
+                success = 0
                 for content in contents:
-                    replyMsg = reply.TextMsg(toUser, fromUser, content)
-                    #print replyMsg.sendJSON()
-                    tempFlag = globalData.wechatBasic.send_message(replyMsg.sendJSON())
-                    if not tempFlag:
-                        successFlag = False
-
-                if successFlag:
+                    reply_message = ReplyMessage(to_user, from_user, content, 'text')
+                    success += connection.send_message(reply_message.get_json())
+                if success == 0:
                     return "success"
                 else:
                     return
             else:
-                print "Ignored"
                 return "success"
         except Exception, Argment:
             return Argment

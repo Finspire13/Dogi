@@ -1,32 +1,17 @@
-# -*- coding: utf-8 -*-
-# filename: receive.py
-import xml.etree.ElementTree as ET
+from xml.etree import ElementTree
 
-def parse_xml(web_data):
-    if len(web_data) == 0:
-        return None
-    xmlData = ET.fromstring(web_data)
-    msg_type = xmlData.find('MsgType').text
-    if msg_type == 'text':
-        return TextMsg(xmlData)
-    elif msg_type == 'image':
-        return ImageMsg(xmlData)
 
-class Msg(object):
-    def __init__(self, xmlData):
-        self.ToUserName = xmlData.find('ToUserName').text
-        self.FromUserName = xmlData.find('FromUserName').text
-        self.CreateTime = xmlData.find('CreateTime').text
-        self.MsgType = xmlData.find('MsgType').text
-        self.MsgId = xmlData.find('MsgId').text
-
-class TextMsg(Msg):
-    def __init__(self, xmlData):
-        Msg.__init__(self, xmlData)
-        self.Content = xmlData.find('Content').text.encode("utf-8")
-
-class ImageMsg(Msg):
-    def __init__(self, xmlData):
-        Msg.__init__(self, xmlData)
-        self.PicUrl = xmlData.find('PicUrl').text
-        self.MediaId = xmlData.find('MediaId').text
+class ReceiveMessage:
+    def __init__(self, web_data):
+        self.xml_data = ElementTree.fromstring(web_data)
+        self.to_user_name = xml_data.find('ToUserName').text
+        self.from_user_name = xml_data.find('FromUserName').text
+        self.create_time = xml_data.find('CreateTime').text
+        self.message_type = xml_data.find('MsgType').text
+        self.message_id = xml_data.find('MsgId').text
+        self.xml_data = ET.fromstring(web_data)
+        if self.message_type == 'text':
+            self.content = xml_data.find('Content').text.encode("utf-8")
+        elif self.message_type == 'image':
+            self.picture_url = xml_data.find('PicUrl').text
+            self.media_id = xml_data.find('MediaId').text
