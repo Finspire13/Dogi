@@ -42,7 +42,7 @@ class ReplyMessage:
 
     def get_json(self):
         if self.type == 'text':
-            json_string = '{"touser":"{to_user_name}","msgtype":"text","text":{"content":"{content}"}}'.format(**self.dict)
+            json_string = ('{"touser":"%s","msgtype":"text","text":{"content":"%s"}}') % (self.dict['to_user_name'], self.dict['content'])
         else:
-            json_string = '{"touser":"{to_user_name}","msgtype":"image","image":{"media_id":"{media_id}"}}' .format(**self.dict)
+            json_string = ('{"touser":"%s","msgtype":"image","image":{"media_id":"%s"}}') % (self.dict['to_user_name'], self.dict['media_id'])
         return json_string

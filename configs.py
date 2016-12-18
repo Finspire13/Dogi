@@ -1,5 +1,4 @@
 import time
-import requests
 import json
 
 class Configs:

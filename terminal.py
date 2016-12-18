@@ -43,19 +43,19 @@ def process(user, content):
             # to improve
             elif 'XMASGIFTME' in content:
                 if len(connection.gift_list) == 0:
-                    connection.gift_list[1] = connection.get_user_info(user)['nickname'] + " wants " + content
+                    connection.gift_list[str(1)] = connection.get_user_info(user)['nickname'] + " wants " + content
                 else:
                     exchange = random.randint(1, len(connection.gift_list)+1)
-                    gift = connection.gift_list[exchange]
-                    connection.gift_list[len(connection.gift_list)+1] = gift
-                    connection.gift_list[exchange] = connection.get_user_info(user)['nickname'] + " wants " + content
+                    gift = connection.gift_list[str(exchange)]
+                    connection.gift_list[str(len(connection.gift_list)+1)] = gift
+                    connection.gift_list[str(exchange)] = connection.get_user_info(user)['nickname'] + " wants " + content
             elif 'ZBUG!OPERATIONAL!' in content:
                  result_list = []
                  for i in range(0, len(connection.gift_list)):
                      from reply import ReplyMessage
-                     reply_message = ReplyMessage(connection.zbug[i], connection.me, connection.gift_list[i], 'text')
+                     reply_message = ReplyMessage(connection.zbug[i], connection.me, connection.gift_list[str(i)], 'text')
                      connection.send_message(reply_message.get_json())
-                     result_list.append(connection.gift_list[i])
+                     result_list.append(connection.gift_list[str(i)])
                  return result_list
             else:
                 # print 4
