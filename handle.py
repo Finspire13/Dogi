@@ -34,6 +34,7 @@ class Handle(object):
     def POST(self):
         try:
             web_data = web.data()
+            print web_data
             if len(web_data) == 0:
                 return "success"
             receive_message = ReceiveMessage(web_data)
@@ -42,12 +43,11 @@ class Handle(object):
                 from_user = receive_message.to_user_name
                 received_content = receive_message.content
                 contents = process(to_user, received_content)
-                if to_user not in connection.zbug:
-                    connection.zbug.append(to_user)
-                    connection.me = from_user
+                connection.me = from_user
                 success = 0
                 for content in contents:
                     reply_message = ReplyMessage(to_user, from_user, content, 'text')
+                    #print reply_message.get_json()
                     success += connection.send_message(reply_message.get_json())
                 if success == 0:
                     return "success"

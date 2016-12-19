@@ -3,6 +3,8 @@ class Command:
         def __init__(self):
                 self.commands = {
                         "help": ("These commands are defined internally:\n\n" +
+                                 "users\n" +
+                                 "<Show all active users connected to Dogi.>\n\n" +
                                  "info [subject]\n" +
                                  "<Get information about the subject.>\n\n" +
                                  "list [option]\n" +
@@ -26,30 +28,28 @@ class Command:
                                     "0x011115 File Missing\n" +
                                     "0x0843C4 File Missing\n"),
 
-                        "info Dogi": ("Dogi series is an advanced AI system in development.\n\n" +
+                        "info dogi": ("Dogi series is an advanced AI system in development.\n\n" +
                                       "Dogi with its full ability will promise human a brave new world.\n\n" +
                                       "The main contributor to Dogi is Dr.Ferrari. Dogi is supported by Ginne Inc."),
 
-                        "info Mr.Dog": "A great man",
+                        "info mr.dog": "A great man",
 
-                        "info Dr.Ferrari": ("Donald Ferrari is an American computer scientist." +
+                        "info dr.ferrari": ("Donald Ferrari is an American computer scientist." +
                                             " He is the author of the multi-volume work Principles of Intelligent Agent." +
                                             " He contributed to the development of highly-reliable AI system.\n" +
                                             "Personal website: 123.206.179.29/ferrari"),
 
-                        "info Ginne": (
-                        "Ginne is an multinational technology company with the vision of reducing the 'risk of human extinction' " +
-                        "and conducting space exploration."),
+                        "info ginne": ("Ginne is an multinational technology company with the vision of reducing the 'risk of human extinction' " +
+                                       "and conducting space exploration."),
 
-                        "info Ginne Inc.": (
-                        "Ginne is an multinational technology company with the vision of reducing the 'risk of human extinction' " +
-                        "and conducting space exploration."),
+                        "info ginne inc.": ("Ginne is an multinational technology company with the vision of reducing the 'risk of human extinction' " +
+                                            "and conducting space exploration."),
 
-                        "info RAIRC": ("Robots and Artificial Intelligence Regulatory Commission (RAIRC) " +
-                                       "is an international agency tasked with protecting public safety against misuse of AI and robots." +
+                        "info rairc": ("Robots and Artificial Intelligence Regulatory Commission (RAIRC) " +
+                                       "is an international agency tasked with protecting public safety against misuse of AI and robots. " +
                                        "RAIRC was established in 2015 as a result of Shanghai Protocol."),
 
-                        "info Shanghai Protocol": "Missing",
+                        "info shanghai protocol": "Missing",
 
                         "open readme": ("Something dangerous is hidden in this system and you must find it.\n\n" +
                                         "Dogi terminals are synced with Dogi Cloud Server. You need to check Dogi for every update.\n\n" +

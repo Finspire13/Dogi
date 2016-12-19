@@ -1,8 +1,11 @@
 import random
+import string
 from commands import commands
 from connection import connection
 
 def process(user, content):
+    originalContent = content
+    content = content.lower()
     if user in connection.user_list:
         if connection.user_list[user] == 'Started':
             if content == "human":
@@ -12,7 +15,7 @@ def process(user, content):
                 result2 = result2.encode('utf-8')
                 result_list = [result1, result2]
                 return result_list
-            elif content == "AI":
+            elif content == "ai":
                 connection.user_list.pop(user)
                 result1 = "Authenticating..."
                 result2 = ("Permission Denied: \nAI Unregistered with RAIRC.\n" +
@@ -40,29 +43,50 @@ def process(user, content):
                            "Finished.")
                 result_list = [result1, result2]
                 return result_list
-            # to improve
-            elif 'XMASGIFTME' in content:
-                if len(connection.gift_list) == 0:
-                    connection.gift_list[str(1)] = connection.get_user_info(user)['nickname'] + " wants " + content
-                else:
-                    exchange = random.randint(1, len(connection.gift_list)+1)
-                    gift = connection.gift_list[str(exchange)]
-                    connection.gift_list[str(len(connection.gift_list)+1)] = gift
-                    connection.gift_list[str(exchange)] = connection.get_user_info(user)['nickname'] + " wants " + content
-            elif 'ZBUG!OPERATIONAL!' in content:
+            elif content == 'users':
+                result=''
+                random_string1 = ''.join(random.sample(string.lowercase+string.digits ,7))
+                random_string2 = ''.join(random.sample(string.lowercase+string.digits ,7))
+                result = result + "AI : " + random_string1 + '\n'
+                result = result + "AI : " + random_string2 + '\n'
+                result = result + 'Dr.Ferrari\n'
+
+                for user_id in connection.user_list.keys():
+                    if connection.user_list[user_id] == 'Logged In':
+                        result = result + connection.get_user_info(user_id)['nickname'].encode("utf-8") + '\n'
+
+                result_list = [result]
+                return result_list
+            elif 'xmasgiftme' in content:
+                name = connection.get_user_info(user)['nickname']
+                connection.gift_list[name] = name + ": " + originalContent
+                print connection.gift_list
+                result = "Recorded: " + name + ": " + originalContent
+                result_list = [result.encode("utf-8")]
+                if user not in connection.zbug:
+                    connection.zbug.append(user)
+                    print len(connection.zbug)
+                return result_list
+            elif '!zbug!' in content:
                  result_list = []
-                 for i in range(0, len(connection.gift_list)):
+                 random.shuffle(connection.zbug)
+                 for i, user in enumerate(connection.gift_list.keys()):
                      from reply import ReplyMessage
-                     reply_message = ReplyMessage(connection.zbug[i], connection.me, connection.gift_list[str(i)], 'text')
-                     connection.send_message(reply_message.get_json())
-                     result_list.append(connection.gift_list[str(i)])
+                     reply_message = ReplyMessage(connection.zbug[i], connection.me, connection.gift_list[user], 'text')
+                     try:
+                         connection.send_message(reply_message.get_json().encode("utf-8"))
+                         result_list.append(user.encode("utf-8"))
+                     except Exception as e:
+                         print str(e)
+                 connection.zbug = []
+                 connection.gift_list = dict()
                  return result_list
             else:
                 # print 4
                 result_list = [commands.get(content)]
                 return result_list
     else:
-        if content == "Dogi":
+        if content == "dogi":
             connection.user_list[user] = 'Started'
             result1 = ("Dogi Instance #" + str(int(random.random() * 70 + 30)) + "\nVersion 1.0.2\n" +
                        "==============>100%\n" +
