@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+# filename: handle.py
+
 import hashlib
 from reply import ReplyMessage
 from receive import ReceiveMessage

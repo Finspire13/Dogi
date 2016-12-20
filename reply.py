@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+# filename: reply.py
+
 import time
 
 class ReplyMessage:

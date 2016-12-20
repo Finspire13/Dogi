@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+# filename: configs.py
+
 import time
 import json
 

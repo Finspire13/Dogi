@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+# filename: commands.py
+
 #TODO deal with the mass
 class Command:
         def __init__(self):

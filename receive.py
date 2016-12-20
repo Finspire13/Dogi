@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+# filename: receive.py
+
 from xml.etree import ElementTree
 
 

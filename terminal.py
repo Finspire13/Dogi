@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+# filename: terminal.py
+
 import random
 import string
 from commands import commands

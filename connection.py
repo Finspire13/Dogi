@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+# filename: connection.py
+
 import requests
 import time
 from configs import settings
