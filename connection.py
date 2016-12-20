@@ -10,8 +10,8 @@ from configs import settings
 class Connection:
     def __init__(self):
         self.user_list = dict()
-        self.gift_list = dict()
-        self.zbug = []
+        self.gift_list = []
+        self.zbug_user = []
         self.me = None
         self.access_token_count = 0
     def send_message(self, data):

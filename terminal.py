@@ -61,29 +61,46 @@ def process(user, content):
                 result_list = [result]
                 return result_list
             elif 'xmasgiftme' in content:
-                name = connection.get_user_info(user)['nickname']
-                connection.gift_list[name] = name + ": " + originalContent
+                if user in connection.zbug_user:
+                    return ["Don't want too much."]
+                nickname = connection.get_user_info(user)['nickname']
+                connection.gift_list.append(nickname + ": " + originalContent)
+                connection.zbug_user.append(user)
+                print connection.zbug_user
                 print connection.gift_list
-                result = "Recorded: " + name + ": " + originalContent
+                result = "Done! Merry Xmas! " + nickname
                 result_list = [result.encode("utf-8")]
-                if user not in connection.zbug:
-                    connection.zbug.append(user)
-                    print len(connection.zbug)
+
                 return result_list
+
             elif '!zbug!' in content:
-                 result_list = []
-                 random.shuffle(connection.zbug)
-                 for i, user in enumerate(connection.gift_list.keys()):
-                     from reply import ReplyMessage
-                     reply_message = ReplyMessage(connection.zbug[i], connection.me, connection.gift_list[user], 'text')
-                     try:
-                         connection.send_message(reply_message.get_json().encode("utf-8"))
-                         result_list.append(user.encode("utf-8"))
-                     except Exception as e:
-                         print str(e)
-                 connection.zbug = []
-                 connection.gift_list = dict()
-                 return result_list
+                
+                from reply import ReplyMessage
+                result_list = []
+                try:
+                    random.shuffle(connection.gift_list)
+                    for i, gift in enumerate(connection.gift_list):
+                        reply_message = ReplyMessage(connection.zbug_user[i], connection.me, gift, 'text')
+                        connection.send_message(reply_message.get_json().encode("utf-8"))
+                        nickname = connection.get_user_info(connection.zbug_user[i])['nickname']
+                        result_list.append(nickname.encode("utf-8"))
+
+                    random_index = random.randint(0, len(connection.zbug_user)-1)
+                    the_lucky_one = connection.zbug_user[random_index]
+                    reply_message = ReplyMessage(the_lucky_one, connection.me, 'You are the lucky one to have Dogi special gift!', 'text')
+
+                    connection.send_message(reply_message.get_json().encode("utf-8"))
+                    nickname = connection.get_user_info(the_lucky_one)['nickname']
+                    result_list.append("The Lucky One:" + nickname.encode("utf-8"))
+                    
+
+                    connection.zbug_user = []
+                    connection.gift_list = []
+
+                except Exception as e:
+                    print str(e)
+                    
+                return result_list
             else:
                 # print 4
                 result_list = [commands.get(content)]
