@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# filename: hold7back.py
+# filename: holdSevenback.py
 
 import random
 import string
@@ -46,19 +46,21 @@ class Player:
 		self.hand.append(card)
 
 	def throw_card(self, card):
-		if card in self.hand:
-			self.hand.remove(card)
-			return True
-		else:
-			return False
+		for handcard in self.hand:
+			if card.color == handcard.color and card.value == handcard.value:
+				self.hand.remove(handcard)
+				return True
+
+		return False
 
 	def keep_card(self, card):
-		if card in self.hand:
-			self.hand.remove(card)
-			self.penalty.append(card)
-			return True
-		else:
-			return False
+		for handcard in self.hand:
+			if card.color == handcard.color and card.value == handcard.value:
+				self.hand.remove(handcard)
+				self.penalty.append(handcard)
+				return True
+
+		return False
 
 	def get_score(self):
 		score = 0
@@ -119,7 +121,7 @@ class Table:
 			for player in self.players:
 				card = card_stack.pop()
 				player.draw_card(card)
-				print player.nickname + card.get_text()
+				#print player.nickname + card.get_text()
 
 	def next_turn(self, player ,card, action):
 		if self.turn_count >= turns_num:
@@ -130,7 +132,7 @@ class Table:
 		if current_player != player:
 			return "还没到你的回合"
 
-		if action == 'Keep':
+		if action == 'KEEP':
 			if self.__have_card_to_throw():
 				return '你有能出的牌'
 			if current_player.keep_card(card):
@@ -140,7 +142,7 @@ class Table:
 				return 'OK'
 			else:
 				return '你没有这张牌'
-		elif action == "Throw":
+		elif action == "THROW":
 			if not self.__can_throw_card(card):
 				return '你不能出这张牌'
 			if current_player.throw_card(card):
@@ -165,6 +167,9 @@ class Table:
 		return False
 
 	def __can_throw_card(self, card):
+		if values[card.value] == 7:
+			return True
+
 		index = values[card.value]-1
 		left_index = values[card.value]-2
 		right_index = values[card.value]
@@ -172,9 +177,13 @@ class Table:
 			if left_index < 0:
 				if self.cards_on_desk[card.color][right_index] == True:
 					return True
+				else:
+					return False
 			if right_index >= len(self.cards_on_desk[card.color]):
 				if self.cards_on_desk[card.color][left_index] == True:
 					return True
+				else:
+					return False
 			if self.cards_on_desk[card.color][left_index] != self.cards_on_desk[card.color][right_index]:
 				return True
 
@@ -183,11 +192,83 @@ class Table:
 	def get_current_player(self):
 		return self.players[self.turn_count % players_num]
 
+	def get_desk_cards_text(self):
+		result = ''
+		for color in colors:
+			result = result + color + ' '
+			for i, boo in enumerate(self.cards_on_desk[color]):
+				if boo == True:
+					value_text = values.keys()[values.values().index(i+1)]
+					result += value_text
+				else:
+					result += '-'
+			result += '\n'
+
+		return result
+
+
 
 class HoldSevenBackGame():
 	def __init__(self):
 		self.players_in_waiting = []
 		self.players_at_table = {}
+
+	def __messages_before_turn(self, table):
+		#----Message----
+		print 'Send to all: 轮到' + table.get_current_player().nickname + "出牌\n"
+		print '桌面\n' + new_table.get_desk_cards_text()
+		print 'Send to ' + new_table.get_current_player().nickname + ':手牌\n' + new_table.get_current_player().get_hand_text()
+		#---------------
+
+	def __messages_after_turn(self, table, player, card, action):
+		#----Message----
+		if action == 'KEEP':
+			print 'Send to all:' + player.nickname + '扣了一张牌'
+		elif action == 'THROW':
+			print 'Send to all:' + player.nickname + '出了一张牌' + card.get_text()
+		else:
+			return
+		print 'Send to all: 回合结束'
+		#---------------
+
+	def __messages_game_start(self, table):
+		#----Message----
+		print "Send to all: 游戏开始，玩家：\n"
+		for player in table.player:
+				print player.nickname + '\n'
+		print "Send to all: 正在发牌...\n"
+		self.__messages_before_turn(table)
+		#---------------
+
+	def __messages_game_over(self, table):
+		#----Message----
+		game_result = '游戏结束! 得分如下：\n'
+		for player in table.players:
+			game_result += player.nickname + ': ' + player.get_score() + '\n'
+		print "Send to all:" + game_result
+		print "Send to all: 已经退出游戏"
+		#---------------
+
+	def __messages_player_quit(self, table):
+		#----Message----
+		print 'Send to all: 玩家退出，游戏结束\n'
+		#---------------
+
+	def __messages_broadcast(self, table, player, content):
+		#----Message----
+		print 'Send to all:' + player.nickname + content + '\n'
+		#---------------
+
+	def __messages_help(self, player):
+		#----Message----
+		print 'Send to ' + player.nickname + 'HELPSOMETHING'
+		#---------------
+
+	def __messages_add_player(self, player):
+		#----Message----
+		print 'Send to ' + player.nickname + '正在寻找玩家...'
+		#---------------
+
 
 	def add_player(self, player):
 		if player in self.players_in_waiting:
@@ -196,25 +277,32 @@ class HoldSevenBackGame():
 			return 
 
 		self.players_in_waiting.append(player)
+
+		#----Message----
+		self.__messages_help(player)
+		self.__messages_add_player(player)
+		#---------------
+
+
 		if len(self.players_in_waiting) == players_num:
 			new_table = Table(self.players_in_waiting)
 			for player in self.players_in_waiting:
 				self.players_at_table[player.openid] = new_table
 			new_table.draw_cards()
 
-			print "游戏开始\n"
-			for player in self.players_in_waiting:
-				print player.openid + '\n'
-			print new_table.get_current_player().nickname + "出牌\n"
-			print '手牌\n' + new_table.get_current_player().get_hand_text()
+			#----Message----
+			self.__messages_game_start(new_table)
+			#---------------
 
 			self.players_in_waiting = []
 
 	def __player_quit(self, player):
 		if player.openid in self.players_at_table.keys():
 			table = self.players_at_table[player.openid]
+			#----Message----
+			self.__messages_player_quit(table)
+			#---------------
 			self.__clean_table(table)
-			print '玩家退出，游戏结束\n'
 		else:
 			self.players_in_waiting.remove(player)
 
@@ -224,15 +312,21 @@ class HoldSevenBackGame():
 
 	def process(self, player, command):
 		if player.openid in self.players_at_table.keys():
+			table = self.players_at_table[player.openid]
+
 			if command == 'QUIT GAME':
 				self.__player_quit(player)
 				return []
+			elif command == 'DESK':
+				return ['桌面\n' + table.get_desk_cards_text()]
 			elif command == 'HAND':
 				return ['手牌\n' + player.get_hand_text()]
 			elif command == 'PENALTY':
-				return ['扣牌\n' + player.get_hand_text()]
+				return ['扣牌\n' + player.get_penalty_text()]
 			elif command.startswith('SAY'):
-				print player.nickname + command + '\n'
+				#----Message----
+				self.__messages_broadcast(table, player, command.upper())
+				#---------------
 			elif command.startswith('KEEP') or command.startswith('THROW'):
 				split_command = command.split(' ')
 				if len(split_command) != 2 or len(split_command[1]) < 2:
@@ -241,33 +335,38 @@ class HoldSevenBackGame():
 				value = split_command[1][1:]
 				color = split_command[1][0]
 
-				if not color in colors:
+				if color not in colors:
 					return ['指令格式错误']
-				if not value in values.keys:
+				if value not in values.keys():
 					return ['指令格式错误']
 
 				card = Card(color,value)
-				table = self.players_at_table[player.openid]
-
+				
 				if command.startswith('KEEP'):
-					response = table.next_turn(player, card, 'Keep')
+					response = table.next_turn(player, card, 'KEEP')
 					if response == "游戏已结束":
+						#----Message----
+						self.__messages_game_over(table)
+						#---------------
 						self.__clean_table(table)
-						game_result = '游戏结束! 得分如下：\n'
-						for temp in table.players:
-							game_result += temp.nickname + ': ' + temp.get_score() + '\n'
-						print game_result
-						return []
+					elif response == "OK":
+						#----Message----
+						self.__messages_after_turn(table, player, card, 'KEEP')
+						self.__messages_before_turn(table)
+						#---------------
 					return [response]
 				else:
 					response = table.next_turn(player, card, 'THROW')
 					if response == "游戏已结束":
+						#----Message----
+						self.__messages_game_over(table)
+						#---------------
 						self.__clean_table(table)
-						game_result = '游戏结束! 得分如下：\n'
-						for temp in table.players:
-							game_result += temp.nickname + ': ' + temp.get_score() + '\n'
-						print game_result
-						return []
+					elif response == "OK":
+						#----Message----
+						self.__messages_after_turn(table, player, card, 'THROW')
+						self.__messages_before_turn(table)
+						#---------------
 					return [response]
 
 			else:
