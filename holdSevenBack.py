@@ -216,8 +216,8 @@ class HoldSevenBackGame():
 	def __messages_before_turn(self, table):
 		#----Message----
 		print 'Send to all: 轮到' + table.get_current_player().nickname + "出牌\n"
-		print '桌面\n' + new_table.get_desk_cards_text()
-		print 'Send to ' + new_table.get_current_player().nickname + ':手牌\n' + new_table.get_current_player().get_hand_text()
+		print '桌面\n' + table.get_desk_cards_text()
+		print 'Send to ' + table.get_current_player().nickname + ':手牌\n' + table.get_current_player().get_hand_text()
 		#---------------
 
 	def __messages_after_turn(self, table, player, card, action):
@@ -234,7 +234,7 @@ class HoldSevenBackGame():
 	def __messages_game_start(self, table):
 		#----Message----
 		print "Send to all: 游戏开始，玩家：\n"
-		for player in table.player:
+		for player in table.players:
 				print player.nickname + '\n'
 		print "Send to all: 正在发牌...\n"
 		self.__messages_before_turn(table)
@@ -244,7 +244,7 @@ class HoldSevenBackGame():
 		#----Message----
 		game_result = '游戏结束! 得分如下：\n'
 		for player in table.players:
-			game_result += player.nickname + ': ' + player.get_score() + '\n'
+			game_result += player.nickname + ': ' + str(player.get_score()) + '\n'
 		print "Send to all:" + game_result
 		print "Send to all: 已经退出游戏"
 		#---------------
@@ -316,7 +316,7 @@ class HoldSevenBackGame():
 
 			if command == 'QUIT GAME':
 				self.__player_quit(player)
-				return []
+				return ['已经退出游戏']
 			elif command == 'DESK':
 				return ['桌面\n' + table.get_desk_cards_text()]
 			elif command == 'HAND':
