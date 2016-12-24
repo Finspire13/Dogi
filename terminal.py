@@ -5,6 +5,8 @@ import random
 import string
 from commands import commands
 from connection import connection
+import holdSevenBack
+from holdSevenBack import hold_seven_back_game
 
 def process(user, content):
     originalContent = content
@@ -60,6 +62,14 @@ def process(user, content):
 
                 result_list = [result]
                 return result_list
+            elif content == 'hold7back':
+                nickname = connection.get_user_info(user)['nickname']
+                new_player = holdSevenBack.Player(user, nickname)
+                hold_seven_back_game.add_player(new_player)
+                connection.hold_seven_back_players[user] = new_player
+                connection.user_list[user] == 'In Hold7back'
+                return []
+
             elif 'xmasgiftme' in content:
                 if user in connection.zbug_user:
                     return ["Don't want too much."]
@@ -77,34 +87,40 @@ def process(user, content):
                 
                 from reply import ReplyMessage
                 result_list = []
-                try:
-                    random.shuffle(connection.gift_list)
-                    for i, gift in enumerate(connection.gift_list):
-                        reply_message = ReplyMessage(connection.zbug_user[i], connection.me, gift, 'text')
-                        connection.send_message(reply_message.get_json().encode("utf-8"))
-                        nickname = connection.get_user_info(connection.zbug_user[i])['nickname']
-                        result_list.append(nickname.encode("utf-8"))
-
-                    random_index = random.randint(0, len(connection.zbug_user)-1)
-                    the_lucky_one = connection.zbug_user[random_index]
-                    reply_message = ReplyMessage(the_lucky_one, connection.me, 'You are the lucky one to have Dogi special gift!', 'text')
-
+                random.shuffle(connection.gift_list)
+                for i, gift in enumerate(connection.gift_list):
+                    reply_message = ReplyMessage(connection.zbug_user[i], connection.me, gift, 'text')
                     connection.send_message(reply_message.get_json().encode("utf-8"))
-                    nickname = connection.get_user_info(the_lucky_one)['nickname']
-                    result_list.append("The Lucky One:" + nickname.encode("utf-8"))
-                    
+                    nickname = connection.get_user_info(connection.zbug_user[i])['nickname']
+                    result_list.append(nickname.encode("utf-8"))
 
-                    connection.zbug_user = []
-                    connection.gift_list = []
+                random_index = random.randint(0, len(connection.zbug_user)-1)
+                the_lucky_one = connection.zbug_user[random_index]
+                reply_message = ReplyMessage(the_lucky_one, connection.me, 'You are the lucky one to have Dogi special gift!', 'text')
 
-                except Exception as e:
-                    print str(e)
+                connection.send_message(reply_message.get_json().encode("utf-8"))
+                nickname = connection.get_user_info(the_lucky_one)['nickname']
+                result_list.append("The Lucky One:" + nickname.encode("utf-8"))
+                
+
+                connection.zbug_user = []
+                connection.gift_list = []
+
                     
                 return result_list
             else:
                 # print 4
                 result_list = [commands.get(content)]
                 return result_list
+        elif connection.user_list[user] == 'In Hold7back':
+            content = content.upper()
+            player = connection.hold_seven_back_players[user]
+            resultList = hold_seven_back_game.process(self, player, content)
+            if content == 'QUIT GAME':
+                connection.hold_seven_back_players.pop(user)
+                connection.user_list[user] == 'Logged In'
+            return resultList
+
     else:
         if content == "dogi":
             connection.user_list[user] = 'Started'

@@ -12,6 +12,7 @@ class Connection:
         self.user_list = dict()
         self.gift_list = []
         self.zbug_user = []
+        self.hold_seven_back_players = dict()
         self.me = None
         self.access_token_count = 0
     def send_message(self, data):

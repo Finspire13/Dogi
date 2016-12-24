@@ -3,6 +3,8 @@
 
 import random
 import string
+from connection import connection
+from reply import ReplyMessage
 
 values = {
 	'A':1,
@@ -215,58 +217,127 @@ class HoldSevenBackGame():
 
 	def __messages_before_turn(self, table):
 		#----Message----
-		print 'Send to all: 轮到' + table.get_current_player().nickname + "出牌\n"
-		print '桌面\n' + table.get_desk_cards_text()
-		print 'Send to ' + table.get_current_player().nickname + ':手牌\n' + table.get_current_player().get_hand_text()
+		# print 'Send to all: 轮到' + table.get_current_player().nickname + "出牌\n"
+		# print '桌面\n' + table.get_desk_cards_text()
+		# print 'Send to ' + table.get_current_player().nickname + ':手牌\n' + table.get_current_player().get_hand_text()
+
+		text1 = '轮到' + table.get_current_player().nickname + "出牌"
+		text2 = '桌面:\n' + table.get_desk_cards_text()
+
+		for player in table.players:
+			message1 = ReplyMessage(player.openid, connection.me, text1, 'text')
+			message2 = ReplyMessage(player.openid, connection.me, text2, 'text')
+			connection.send_message(message1.get_json().encode("utf-8"))
+			connection.send_message(message2.get_json().encode("utf-8"))
+
+		text3 = '手牌:\n' + table.get_current_player().get_hand_text()
+		message3 = ReplyMessage(table.get_current_player().openid, connection.me, text3, 'text')
+		connection.send_message(message3.get_json().encode("utf-8"))
 		#---------------
 
 	def __messages_after_turn(self, table, player, card, action):
 		#----Message----
 		if action == 'KEEP':
-			print 'Send to all:' + player.nickname + '扣了一张牌'
+			# print 'Send to all:' + player.nickname + '扣了一张牌'
+			text = player.nickname + '扣了一张牌'
+			for player in table.players:
+				message = ReplyMessage(player.openid, connection.me, text, 'text')
+				connection.send_message(message.get_json().encode("utf-8"))
 		elif action == 'THROW':
-			print 'Send to all:' + player.nickname + '出了一张牌' + card.get_text()
+			# print 'Send to all:' + player.nickname + '出了一张牌' + card.get_text()
+			text = player.nickname + '出了一张牌' + card.get_text()
+			for player in table.players:
+				message = ReplyMessage(player.openid, connection.me, text, 'text')
+				connection.send_message(message.get_json().encode("utf-8"))
 		else:
 			return
-		print 'Send to all: 回合结束'
+		#print 'Send to all: 回合结束'
+		text = '---回合结束---'
+		for player in table.players:
+			message = ReplyMessage(player.openid, connection.me, text, 'text')
+			connection.send_message(message.get_json().encode("utf-8"))
 		#---------------
 
 	def __messages_game_start(self, table):
 		#----Message----
-		print "Send to all: 游戏开始，玩家：\n"
+		# print "Send to all: 游戏开始，玩家：\n"
+		# for player in table.players:
+		# 		print player.nickname + '\n'
+		# print "Send to all: 正在发牌...\n"
+		text1 = '游戏开始，玩家：\n'
 		for player in table.players:
-				print player.nickname + '\n'
-		print "Send to all: 正在发牌...\n"
+			text1 += player.nickname + '\n'		
+		text2 = '正在发牌...'
+
+		for player in table.players:
+			message1 = ReplyMessage(player.openid, connection.me, text1, 'text')
+			message2 = ReplyMessage(player.openid, connection.me, text2, 'text')
+			connection.send_message(message1.get_json().encode("utf-8"))
+			connection.send_message(message2.get_json().encode("utf-8"))
+
 		self.__messages_before_turn(table)
 		#---------------
 
 	def __messages_game_over(self, table):
 		#----Message----
-		game_result = '游戏结束! 得分如下：\n'
+		text1 = '游戏结束! 得分如下：\n'
 		for player in table.players:
-			game_result += player.nickname + ': ' + str(player.get_score()) + '\n'
-		print "Send to all:" + game_result
-		print "Send to all: 已经退出游戏"
+			text1 += player.nickname + ': ' + str(player.get_score()) + '\n'
+		text2 = '已经退出游戏'
+		for player in table.players:
+			message1 = ReplyMessage(player.openid, connection.me, text1, 'text')
+			message2 = ReplyMessage(player.openid, connection.me, text2, 'text')
+			connection.send_message(message1.get_json().encode("utf-8"))
+			connection.send_message(message2.get_json().encode("utf-8"))		
+		# print "Send to all:" + text1
+		# print "Send to all: 已经退出游戏"
 		#---------------
 
 	def __messages_player_quit(self, table):
 		#----Message----
-		print 'Send to all: 玩家退出，游戏结束\n'
+		#print 'Send to all: 玩家退出，游戏结束'
+		text = '玩家退出，游戏结束'
+		for player in table.players:
+			message = ReplyMessage(player.openid, connection.me, text, 'text')
+			connection.send_message(message.get_json().encode("utf-8"))
 		#---------------
 
 	def __messages_broadcast(self, table, player, content):
 		#----Message----
-		print 'Send to all:' + player.nickname + content + '\n'
+		#print 'Send to all:' + player.nickname + content + '\n'
+		text = player.nickname + content
+		for player in table.players:
+			message = ReplyMessage(player.openid, connection.me, text, 'text')
+			connection.send_message(message.get_json().encode("utf-8"))
 		#---------------
 
 	def __messages_help(self, player):
 		#----Message----
-		print 'Send to ' + player.nickname + 'HELPSOMETHING'
+		#print 'Send to ' + player.nickname + 'HELPSOMETHING'
+		text = ('游戏说明:\n\n'+
+			    '四种花色用 @ # * + 表示\n'+
+			    '数值用A2345678910JQK表示\n\n'+
+			    '-输入DESK查看桌面上的牌\n'+
+			    '-输入HAND查看手牌\n'+
+			    '-输入PENALTY查看已扣的牌\n\n'+
+			    '-输入KEEP [card] 进行扣牌\n'+
+			    '   例：KEEP @K\n'+
+			    '-输入THROW [card] 进行出牌\n'+
+			    '   例：THROW #A\n\n'+
+			    '-输入SAY [Something]说话\n'+
+			    '   例：SAY love you\n\n'+
+			    '-输入QUIT GAME退出游戏\n'+
+			    '-输入HELP查看帮助')
+		message = ReplyMessage(player.openid, connection.me, text, 'text')
+		connection.send_message(message.get_json().encode("utf-8"))
 		#---------------
 
 	def __messages_add_player(self, player):
 		#----Message----
-		print 'Send to ' + player.nickname + '正在寻找玩家...'
+		#print 'Send to ' + player.nickname + '正在寻找玩家...'
+		text = '正在寻找玩家...'
+		message = ReplyMessage(player.openid, connection.me, text, 'text')
+		connection.send_message(message.get_json().encode("utf-8"))
 		#---------------
 
 
@@ -317,6 +388,9 @@ class HoldSevenBackGame():
 			if command == 'QUIT GAME':
 				self.__player_quit(player)
 				return ['已经退出游戏']
+			elif command =='HELP':
+				self.__messages_help(player)
+				return []
 			elif command == 'DESK':
 				return ['桌面\n' + table.get_desk_cards_text()]
 			elif command == 'HAND':

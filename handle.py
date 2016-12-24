@@ -58,5 +58,6 @@ class Handle(object):
                     return
             else:
                 return "success"
-        except Exception, Argment:
+        except Exception as e, Argment:
+            print str(e)
             return Argment
