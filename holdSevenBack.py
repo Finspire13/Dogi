@@ -227,12 +227,12 @@ class HoldSevenBackGame():
 		for player in table.players:
 			message1 = ReplyMessage(player.openid, connection.me, text1, 'text')
 			message2 = ReplyMessage(player.openid, connection.me, text2, 'text')
-			connection.send_message(message1.get_json().encode("utf-8"))
-			connection.send_message(message2.get_json().encode("utf-8"))
+			connection.send_message(message1.get_json())
+			connection.send_message(message2.get_json())
 
 		text3 = '手牌:\n' + table.get_current_player().get_hand_text()
 		message3 = ReplyMessage(table.get_current_player().openid, connection.me, text3, 'text')
-		connection.send_message(message3.get_json().encode("utf-8"))
+		connection.send_message(message3.get_json())
 		#---------------
 
 	def __messages_after_turn(self, table, player, card, action):
@@ -242,20 +242,20 @@ class HoldSevenBackGame():
 			text = player.nickname + '扣了一张牌'
 			for player in table.players:
 				message = ReplyMessage(player.openid, connection.me, text, 'text')
-				connection.send_message(message.get_json().encode("utf-8"))
+				connection.send_message(message.get_json())
 		elif action == 'THROW':
 			# print 'Send to all:' + player.nickname + '出了一张牌' + card.get_text()
 			text = player.nickname + '出了一张牌' + card.get_text()
 			for player in table.players:
 				message = ReplyMessage(player.openid, connection.me, text, 'text')
-				connection.send_message(message.get_json().encode("utf-8"))
+				connection.send_message(message.get_json())
 		else:
 			return
 		#print 'Send to all: 回合结束'
 		text = '---回合结束---'
 		for player in table.players:
 			message = ReplyMessage(player.openid, connection.me, text, 'text')
-			connection.send_message(message.get_json().encode("utf-8"))
+			connection.send_message(message.get_json())
 		#---------------
 
 	def __messages_game_start(self, table):
@@ -272,8 +272,8 @@ class HoldSevenBackGame():
 		for player in table.players:
 			message1 = ReplyMessage(player.openid, connection.me, text1, 'text')
 			message2 = ReplyMessage(player.openid, connection.me, text2, 'text')
-			connection.send_message(message1.get_json().encode("utf-8"))
-			connection.send_message(message2.get_json().encode("utf-8"))
+			connection.send_message(message1.get_json())
+			connection.send_message(message2.get_json())
 
 		self.__messages_before_turn(table)
 		#---------------
@@ -287,8 +287,8 @@ class HoldSevenBackGame():
 		for player in table.players:
 			message1 = ReplyMessage(player.openid, connection.me, text1, 'text')
 			message2 = ReplyMessage(player.openid, connection.me, text2, 'text')
-			connection.send_message(message1.get_json().encode("utf-8"))
-			connection.send_message(message2.get_json().encode("utf-8"))		
+			connection.send_message(message1.get_json())
+			connection.send_message(message2.get_json())		
 		# print "Send to all:" + text1
 		# print "Send to all: 已经退出游戏"
 		#---------------
@@ -299,7 +299,7 @@ class HoldSevenBackGame():
 		text = '玩家退出，游戏结束'
 		for player in table.players:
 			message = ReplyMessage(player.openid, connection.me, text, 'text')
-			connection.send_message(message.get_json().encode("utf-8"))
+			connection.send_message(message.get_json())
 		#---------------
 
 	def __messages_broadcast(self, table, player, content):
@@ -308,7 +308,7 @@ class HoldSevenBackGame():
 		text = player.nickname + content
 		for player in table.players:
 			message = ReplyMessage(player.openid, connection.me, text, 'text')
-			connection.send_message(message.get_json().encode("utf-8"))
+			connection.send_message(message.get_json())
 		#---------------
 
 	def __messages_help(self, player):
@@ -329,7 +329,7 @@ class HoldSevenBackGame():
 			    '-输入QUIT GAME退出游戏\n'+
 			    '-输入HELP查看帮助')
 		message = ReplyMessage(player.openid, connection.me, text, 'text')
-		connection.send_message(message.get_json().encode("utf-8"))
+		connection.send_message(message.get_json())
 		#---------------
 
 	def __messages_add_player(self, player):
@@ -337,7 +337,7 @@ class HoldSevenBackGame():
 		#print 'Send to ' + player.nickname + '正在寻找玩家...'
 		text = '正在寻找玩家...'
 		message = ReplyMessage(player.openid, connection.me, text, 'text')
-		connection.send_message(message.get_json().encode("utf-8"))
+		connection.send_message(message.get_json())
 		#---------------
 
 
@@ -348,6 +348,8 @@ class HoldSevenBackGame():
 			return 
 
 		self.players_in_waiting.append(player)
+		print "Players in waiting:"
+		print self.players_in_waiting
 
 		#----Message----
 		self.__messages_help(player)
@@ -400,6 +402,7 @@ class HoldSevenBackGame():
 			elif command.startswith('SAY'):
 				#----Message----
 				self.__messages_broadcast(table, player, command.upper())
+				return []
 				#---------------
 			elif command.startswith('KEEP') or command.startswith('THROW'):
 				split_command = command.split(' ')
@@ -420,6 +423,7 @@ class HoldSevenBackGame():
 					response = table.next_turn(player, card, 'KEEP')
 					if response == "游戏已结束":
 						#----Message----
+						self.__messages_after_turn(table, player, card, 'KEEP')
 						self.__messages_game_over(table)
 						#---------------
 						self.__clean_table(table)
@@ -433,6 +437,7 @@ class HoldSevenBackGame():
 					response = table.next_turn(player, card, 'THROW')
 					if response == "游戏已结束":
 						#----Message----
+						self.__messages_after_turn(table, player, card, 'THROW')
 						self.__messages_game_over(table)
 						#---------------
 						self.__clean_table(table)
@@ -444,7 +449,7 @@ class HoldSevenBackGame():
 					return [response]
 
 			else:
-				return ['Command Not Found']
+				return ['游戏中无该指令']
 		elif player in self.players_in_waiting:
 			if command == 'QUIT GAME':
 				self.__player_quit(player)

@@ -7,6 +7,7 @@ from receive import ReceiveMessage
 import web
 from terminal import process
 from connection import connection
+import traceback
 
 
 class Handle(object):
@@ -58,6 +59,8 @@ class Handle(object):
                     return
             else:
                 return "success"
-        except Exception as e, Argment:
-            print str(e)
-            return Argment
+        except Exception, Argument:
+            #print str(Exception)
+            #print Argument
+            traceback.print_exc() 
+            return Argument

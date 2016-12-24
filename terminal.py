@@ -64,10 +64,10 @@ def process(user, content):
                 return result_list
             elif content == 'hold7back':
                 nickname = connection.get_user_info(user)['nickname']
-                new_player = holdSevenBack.Player(user, nickname)
+                new_player = holdSevenBack.Player(user, nickname.encode('utf-8'))
                 hold_seven_back_game.add_player(new_player)
                 connection.hold_seven_back_players[user] = new_player
-                connection.user_list[user] == 'In Hold7back'
+                connection.user_list[user] = 'In Hold7back'
                 return []
 
             elif 'xmasgiftme' in content:
@@ -115,10 +115,10 @@ def process(user, content):
         elif connection.user_list[user] == 'In Hold7back':
             content = content.upper()
             player = connection.hold_seven_back_players[user]
-            resultList = hold_seven_back_game.process(self, player, content)
-            if content == 'QUIT GAME':
+            resultList = hold_seven_back_game.process(player, content)
+            if content == 'QUIT GAME' or resultList == ['游戏已结束']:
                 connection.hold_seven_back_players.pop(user)
-                connection.user_list[user] == 'Logged In'
+                connection.user_list[user] = 'Logged In'
             return resultList
 
     else:
