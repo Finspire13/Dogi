@@ -116,9 +116,30 @@ def process(user, content):
             content = content.upper()
             player = connection.hold_seven_back_players[user]
             resultList = hold_seven_back_game.process(player, content)
-            if content == 'QUIT GAME' or resultList == ['游戏已结束']:
-                connection.hold_seven_back_players.pop(user)
-                connection.user_list[user] = 'Logged In'
+
+            # Not so good
+            if content == 'QUIT GAME':
+                if player in hold_seven_back_game.players_in_waiting:
+                    connection.hold_seven_back_players.pop(user)
+                    connection.user_list[user] = 'Logged In'
+                elif:
+                    table = hold_seven_back_game.players_at_table[user]
+                    for player in table.players:
+                        connection.hold_seven_back_players.pop(player.openid)
+                        connection.user_list[player.openid] = 'Logged In'
+
+                hold_seven_back_game.player_quit(player)
+
+
+            
+            if resultList == ['游戏已结束']:
+                table = hold_seven_back_game.players_at_table[user]
+                for player in table.players:
+                    connection.hold_seven_back_players.pop(player.openid)
+                    connection.user_list[player.openid] = 'Logged In'
+
+                hold_seven_back_game.clean_table(table)
+
             return resultList
 
     else:

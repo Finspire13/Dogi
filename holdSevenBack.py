@@ -369,17 +369,17 @@ class HoldSevenBackGame():
 
 			self.players_in_waiting = []
 
-	def __player_quit(self, player):
+	def player_quit(self, player):
 		if player.openid in self.players_at_table.keys():
 			table = self.players_at_table[player.openid]
 			#----Message----
 			self.__messages_player_quit(table)
 			#---------------
-			self.__clean_table(table)
+			self.clean_table(table)
 		else:
 			self.players_in_waiting.remove(player)
 
-	def __clean_table(self, table):
+	def clean_table(self, table):
 		for temp in table.players:
 			self.players_at_table.pop(temp.openid)
 
@@ -388,7 +388,7 @@ class HoldSevenBackGame():
 			table = self.players_at_table[player.openid]
 
 			if command == 'QUIT GAME':
-				self.__player_quit(player)
+				#self.player_quit(player)
 				return ['已经退出游戏']
 			elif command =='HELP':
 				self.__messages_help(player)
@@ -426,7 +426,7 @@ class HoldSevenBackGame():
 						self.__messages_after_turn(table, player, card, 'KEEP')
 						self.__messages_game_over(table)
 						#---------------
-						self.__clean_table(table)
+						#self.clean_table(table)
 					elif response == "OK":
 						#----Message----
 						self.__messages_after_turn(table, player, card, 'KEEP')
@@ -440,7 +440,7 @@ class HoldSevenBackGame():
 						self.__messages_after_turn(table, player, card, 'THROW')
 						self.__messages_game_over(table)
 						#---------------
-						self.__clean_table(table)
+						#self.clean_table(table)
 					elif response == "OK":
 						#----Message----
 						self.__messages_after_turn(table, player, card, 'THROW')
@@ -452,7 +452,7 @@ class HoldSevenBackGame():
 				return ['游戏中无该指令']
 		elif player in self.players_in_waiting:
 			if command == 'QUIT GAME':
-				self.__player_quit(player)
+				#self.player_quit(player)
 				return ['已经退出游戏']
 			else:
 				return ['正在寻找玩家...']
