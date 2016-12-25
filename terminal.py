@@ -119,11 +119,11 @@ def process(user, content):
 
             # Not so good
             if content == 'QUIT GAME':
-                if player in hold_seven_back_game.players_in_waiting:
+                if hold_seven_back_game.is_player_waiting(player)
                     connection.hold_seven_back_players.pop(user)
                     connection.user_list[user] = 'Logged In'
-                elif:
-                    table = hold_seven_back_game.players_at_table[user]
+                else:
+                    table = hold_seven_back_game.get_player_table(player)
                     for player in table.players:
                         connection.hold_seven_back_players.pop(player.openid)
                         connection.user_list[player.openid] = 'Logged In'
@@ -133,7 +133,7 @@ def process(user, content):
 
             
             if resultList == ['游戏已结束']:
-                table = hold_seven_back_game.players_at_table[user]
+                table = hold_seven_back_game.get_player_table(player)
                 for player in table.players:
                     connection.hold_seven_back_players.pop(player.openid)
                     connection.user_list[player.openid] = 'Logged In'

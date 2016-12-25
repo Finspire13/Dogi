@@ -77,15 +77,23 @@ class Player:
 		self.penalty = []
 
 	def get_hand_text(self):
-		text = ''
+		text_array = []
 		for card in self.hand:
-			text += card.get_text() + ' '
+			text_array.append(card.get_text())
+		text_array.sort()
+		text = ''
+		for card_text in text_array:
+			text += card_text + ' '
 		return text
 
 	def get_penalty_text(self):
-		text = ''
+		text_array = []
 		for card in self.penalty:
-			text += card.get_text() + ' '
+			text_array.append(card.get_text())
+		text_array.sort()
+		text = ''
+		for card_text in text_array:
+			text += card_text + ' '
 		return text
 
 
@@ -382,6 +390,16 @@ class HoldSevenBackGame():
 	def clean_table(self, table):
 		for temp in table.players:
 			self.players_at_table.pop(temp.openid)
+
+	def is_player_waiting(self, player):
+		return player in self.players_in_waiting
+
+	def get_player_table(self, player):
+		if player.openid in self.players_at_table.keys():
+			return self.players_at_table[player.openid]
+		else:
+			return
+
 
 	def process(self, player, command):
 		if player.openid in self.players_at_table.keys():
