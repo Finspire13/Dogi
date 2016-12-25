@@ -119,7 +119,7 @@ def process(user, content):
 
             # Not so good
             if content == 'QUIT GAME':
-                if hold_seven_back_game.is_player_waiting(player)
+                if hold_seven_back_game.is_player_waiting(player):
                     connection.hold_seven_back_players.pop(user)
                     connection.user_list[user] = 'Logged In'
                 else:
